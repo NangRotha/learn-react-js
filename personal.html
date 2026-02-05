@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ទម្រង់ទៅ Telegram ផ្ទាល់ខ្លួន</title>
+    <style>
+        body {
+            font-family: 'Battambang', Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f2f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Moul', cursive;
+        }
+        
+        .setup-box {
+            background: #e6fffa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #38b2ac;
+        }
+        
+        .form-box {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px dashed #cbd5e0;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Battambang', sans-serif;
+            box-sizing: border-box;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+        
+        button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: background 0.3s;
+            font-family: 'Battambang', sans-serif;
+        }
+        
+        button:hover:not(:disabled) {
+            background: #3182ce;
+        }
+        
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+            font-family: 'Battambang', sans-serif;
+        }
+        
+        .success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 2px solid #9ae6b4;
+        }
+        
+        .error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 2px solid #fc8181;
+        }
+        
+        .info {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 2px solid #90cdf4;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #4a5568;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #e53e3e;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .step-number {
+            background: #4299e1;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Moul&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>📨 ទម្រង់ទៅ Telegram ផ្ទាល់ខ្លួន</h1>
+        
+        <div class="setup-box">
+            <h3 style="margin-top: 0; color: #2d3748;">⚙️ ការរៀបចំ (ត្រូវធ្វើម្តងគត់)</h3>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>បង្កើត Telegram Bot</strong><br>
+                    ទៅ @BotFather → /newbot → ជ្រើសឈ្មោះ
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>ចម្លង Bot Token</strong><br>
+                    <input type="text" id="botToken" placeholder="បិទទុក Token នៅទីនេះ... (1234567890:ABC...)" style="font-size: 14px; margin: 5px 0;">
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>ទទួល Chat ID ផ្ទាល់ខ្លួន</strong><br>
+                    <button onclick="getMyChatId()" style="width: auto; margin: 5px 0; padding: 10px 20px;">🆔 រក Chat ID របស់ខ្ញុំ</button>
+                    <input type="text" id="chatId" placeholder="Chat ID នឹងបង្ហាញនៅទីនេះ..." readonly style="font-size: 14px; background: #f0f0f0;">
+                </div>
+            </div>
+            
+            <div id="setupMessage" class="message info" style="display: none; margin-top: 15px;">
+                ការកំណត់ត្រូវបានរក្សាទុករួច! ឥឡូវអ្នកអាចប្រើទម្រង់បាន។
+            </div>
+        </div>
+        
+        <div class="form-box">
+            <h3 style="color: #2d3748; margin-top: 0;">📝 ទម្រង់បញ្ជូនសារ</h3>
+            <div id="formMessage" class="message"></div>
+            
+            <form id="personalTelegramForm">
+                <div>
+                    <label class="required">ឈ្មោះអ្នកផ្ញើ</label>
+                    <input type="text" id="senderName" placeholder="សុខ សំអាត" required>
+                </div>
+                
+                <div>
+                    <label class="required">អ៊ីមែល</label>
+                    <input type="email" id="senderEmail" placeholder="soksamath@example.com" required>
+                </div>
+                
+                <div>
+                    <label>លេខទូរស័ព្ទ</label>
+                    <input type="tel" id="senderPhone" placeholder="+855 12 345 678">
+                </div>
+                
+                <div>
+                    <label class="required">ប្រភេទសំណើ</label>
+                    <select id="requestType" required>
+                        <option value="">-- ជ្រើសរើស --</option>
+                        <option value="សំណើទូទៅ">សំណើទូទៅ</option>
+                        <option value="សេវាកម្ម">សេវាកម្ម</option>
+                        <option value="ការទិញ">ការទិញ</option>
+                        <option value="ការរុករក">ការរុករក</option>
+                        <option value="ផ្សេងៗ">ផ្សេងៗ</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="required">សារ</label>
+                    <textarea id="message" rows="5" placeholder="សួស្តី ខ្ញុំចង់..." required></textarea>
+                </div>
+                
+                <button type="submit" id="submitBtn">
+                    <span id="btnText">📤 ផ្ញើទៅ Telegram របស់ខ្ញុំ</span>
+                    <span id="btnLoading" style="display: none;">⏳ កំពុងផ្ញើ...</span>
+                </button>
+            </form>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 15px; background: #fffaf0; border-radius: 10px; border: 2px solid #fed7aa;">
+            <h4 style="color: #dd6b20; margin-top: 0;">💡 ព័ត៌មានសំខាន់៖</h4>
+            <ul style="margin-bottom: 0;">
+                <li>សារនឹងត្រូវបានផ្ញើ <strong>ដោយផ្ទាល់ទៅ Telegram ផ្ទាល់របស់អ្នក</strong></li>
+                <li>មានតែអ្នកទេដែលនឹងទទួលសារ (តាម Chat ID របស់អ្នក)</li>
+                <li>អ្នកត្រូវតែ <strong>ផ្ញើសារមួយទៅ Bot</strong> មុននឹងរក Chat ID បាន</li>
+                <li>ការកំណត់ត្រូវបានរក្សាទុកក្នុងឧបករណ៍រាយការណ៍របស់អ្នក</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // ទុកការកំណត់
+        let config = {
+            botToken: '',
+            chatId: ''
+        };
+        
+        // ទាញយកការកំណត់ពី localStorage
+        function loadConfig() {
+            const savedToken = localStorage.getItem('personalTelegramToken');
+            const savedChatId = localStorage.getItem('personalTelegramChatId');
+            
+            if (savedToken) {
+                document.getElementById('botToken').value = savedToken;
+                config.botToken = savedToken;
+            }
+            
+            if (savedChatId) {
+                document.getElementById('chatId').value = savedChatId;
+                config.chatId = savedChatId;
+            }
+            
+            if (savedToken && savedChatId) {
+                document.getElementById('setupMessage').style.display = 'block';
+            }
+        }
+        
+        // រក្សាការកំណត់
+        document.getElementById('botToken').addEventListener('input', function() {
+            config.botToken = this.value;
+            localStorage.setItem('personalTelegramToken', this.value);
+        });
+        
+        // មុខងារសម្រាប់រក Chat ID
+        async function getMyChatId() {
+            const token = document.getElementById('botToken').value.trim();
+            
+            if (!token) {
+                showFormMessage('សូមបំពេញ Bot Token ជាមុនសិន!', 'error');
+                return;
+            }
+            
+            const chatIdInput = document.getElementById('chatId');
+            chatIdInput.value = 'កំពុងរកមើល...';
+            
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
+                const data = await response.json();
+                
+                if (data.ok && data.result.length > 0) {
+                    // យក Chat ID ពីសារចុងក្រោយ
+                    const latestUpdate = data.result[data.result.length - 1];
+                    const chatId = latestUpdate.message.chat.id;
+                    
+                    config.chatId = chatId;
+                    chatIdInput.value = chatId;
+                    localStorage.setItem('personalTelegramChatId', chatId);
+                    
+                    showFormMessage('✅ រកឃើញ Chat ID រួច! ឥឡូវអ្នកអាចប្រើទម្រង់បាន។', 'success');
+                    document.getElementById('setupMessage').style.display = 'block';
+                } else {
+                    chatIdInput.value = '';
+                    showFormMessage('ពុំមានសារណាមួយទេ។ សូមផ្ញើសារ "សួស្តី" ទៅ Bot របស់អ្នកជាមុនសិន។', 'error');
+                }
+            } catch (error) {
+                chatIdInput.value = '';
+                showFormMessage('កំហុស៖ ' + error.message, 'error');
+            }
+        }
+        
+        // ការដាក់ស្នើទម្រង់
+        document.getElementById('personalTelegramForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // ផ្ទៀងផ្ទាត់ការកំណត់
+            if (!config.botToken || !config.chatId) {
+                showFormMessage('សូមរៀបចំការកំណត់ជាមុនសិន! (Bot Token + Chat ID)', 'error');
+                return;
+            }
+            
+            // ទាញយកទិន្នន័យ
+            const formData = {
+                name: document.getElementById('senderName').value,
+                email: document.getElementById('senderEmail').value,
+                phone: document.getElementById('senderPhone').value,
+                type: document.getElementById('requestType').value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toLocaleString('km-KH'),
+                ip: await getUserIP()
+            };
+            
+            // បង្ហាញការផ្ទុក
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            
+            submitBtn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            
+            try {
+                // បង្កើតសារ
+                const telegramMessage = `
+📨 *សារថ្មីពីទម្រង់*
+
+👤 *អ្នកផ្ញើ:* ${escapeMarkdown(formData.name)}
+📧 *អ៊ីមែល:* ${escapeMarkdown(formData.email)}
+📱 *ទូរស័ព្ទ:* ${formData.phone ? escapeMarkdown(formData.phone) : 'មិនបានបញ្ជាក់'}
+🏷️ *ប្រភេទ:* ${escapeMarkdown(formData.type)}
+🕒 *ពេលវេលា:* ${formData.timestamp}
+🌐 *IP:* ${formData.ip}
+
+💬 *សារ:*
+${escapeMarkdown(formData.message)}
+
+━━━━━━━━━━━━━━━━━━━
+*សារនេះបានមកពីទម្រង់អនឡាញ*
+                `;
+                
+                // ផ្ញើទៅ Telegram
+                const success = await sendToTelegram(telegramMessage);
+                
+                if (success) {
+                    showFormMessage('✅ ជោគជ័យ! សារត្រូវបានផ្ញើទៅ Telegram របស់អ្នក។', 'success');
+                    this.reset();
+                } else {
+                    showFormMessage('❌ មិនអាចផ្ញើសារបាន។ សូមពិនិត្យការកំណត់របស់អ្នក។', 'error');
+                }
+            } catch (error) {
+                showFormMessage('❌ កំហុស៖ ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+            }
+        });
+        
+        // ផ្ញើសារទៅ Telegram
+        async function sendToTelegram(message) {
+            const url = `https://api.telegram.org/bot${config.botToken}/sendMessage`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: config.chatId,
+                        text: message,
+                        parse_mode: 'Markdown',
+                        disable_web_page_preview: true
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('Telegram response:', result);
+                return result.ok === true;
+            } catch (error) {
+                console.error('Telegram error:', error);
+                return false;
+            }
+        }
+        
+        // ទទួល IP អ្នកប្រើ
+        async function getUserIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch {
+                return 'មិនអាចទទួលបាន';
+            }
+        }
+        
+        // គេចពីតួអក្សរ Markdown
+        function escapeMarkdown(text) {
+            return String(text)
+                .replace(/_/g, '\\_')
+                .replace(/\*/g, '\\*')
+                .replace(/\[/g, '\\[')
+                .replace(/\]/g, '\\]')
+                .replace(/\(/g, '\\(')
+                .replace(/\)/g, '\\)')
+                .replace(/~/g, '\\~')
+                .replace(/`/g, '\\`')
+                .replace(/>/g, '\\>')
+                .replace(/#/g, '\\#')
+                .replace(/\+/g, '\\+')
+                .replace(/-/g, '\\-')
+                .replace(/=/g, '\\=')
+                .replace(/\|/g, '\\|')
+                .replace(/\{/g, '\\{')
+                .replace(/\}/g, '\\}');
+        }
+        
+        // បង្ហាញសារ
+        function showFormMessage(text, type) {
+            const messageDiv = document.getElementById('formMessage');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // ដំណើរការពេលទំព័រផ្ទុក
+        window.addEventListener('load', function() {
+            loadConfig();
+            
+            // បំពេញទិន្នន័យគំរូ
+            if (!localStorage.getItem('formDataPrefilled')) {
+                document.getElementById('senderName').value = 'សុខ សំអាត';
+                document.getElementById('senderEmail').value = 'soksamath@gmail.com';
+                document.getElementById('senderPhone').value = '+855 12 345 678';
+                document.getElementById('requestType').value = 'សំណើទូទៅ';
+                document.getElementById('message').value = 'សួស្តី ខ្ញុំចង់សាកល្បងប្រព័ន្ធផ្ញើទម្រង់ទៅ Telegram ផ្ទាល់ខ្លួន។';
+                
+                localStorage.setItem('formDataPrefilled', 'true');
+            }
+        });
+    </script>
+</body>
+</html>

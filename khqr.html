@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>បង្កើត KHQR សម្រាប់ទូទាត់</title>
+    <style>
+        body {
+            font-family: 'Battambang', Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #1a365d;
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Moul', cursive;
+        }
+        
+        .form-section, .qr-section {
+            background: #edf2f7;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Battambang', sans-serif;
+        }
+        
+        button {
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: background 0.3s;
+            font-family: 'Battambang', sans-serif;
+        }
+        
+        button:hover {
+            background: #2c5282;
+        }
+        
+        #khqrCode {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #cbd5e0;
+        }
+        
+        #qrImage {
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .bank-logos {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .bank-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .aba { background: #1a365d; }
+        .acleda { background: #c53030; }
+        .wing { background: #2f855a; }
+        .prasac { background: #744210; }
+        
+        .instructions {
+            background: #fffaf0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border-left: 5px solid #dd6b20;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Moul&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🧾 បង្កើត KHQR សម្រាប់ទូទាត់</h1>
+        
+        <div class="bank-logos">
+            <div class="bank-logo aba">ABA</div>
+            <div class="bank-logo acleda">ACLEDA</div>
+            <div class="bank-logo wing">Wing</div>
+            <div class="bank-logo prasac">Prasac</div>
+            <div class="bank-logo" style="background: #4c51bf;">+8 ធនាគារ</div>
+        </div>
+        
+        <div class="form-section">
+            <h3>📝 ព័ត៌មានទូទាត់</h3>
+            
+            <div>
+                <label>ឈ្មោះអ្នកទទួល (របស់អ្នក)</label>
+                <input type="text" id="merchantName" placeholder="ហាង ABC" value="ហាងអេប៊ីស៊ី">
+            </div>
+            
+            <div>
+                <label>លេខគណនីធនាគារ</label>
+                <input type="text" id="accountNumber" placeholder="123456789" value="123456789">
+            </div>
+            
+            <div>
+                <label>ធនាគារ</label>
+                <select id="bankCode">
+                    <option value="ABA">ABA Bank</option>
+                    <option value="ACLEDA">ACLEDA Bank</option>
+                    <option value="WING">Wing Bank</option>
+                    <option value="PRASAC">Prasac Microfinance</option>
+                    <option value="CAB">Cambodia Asia Bank</option>
+                    <option value="JDB">J Trust Royal Bank</option>
+                </select>
+            </div>
+            
+            <div>
+                <label>ចំនួនទឹកប្រាក់ (រៀល)</label>
+                <input type="number" id="amount" placeholder="10000" value="10000">
+                <small style="color: #718096;">ទុកទទេបើចង់ឱ្យអតិថិជនបញ្ចូលដោយខ្លួនឯង</small>
+            </div>
+            
+            <div>
+                <label>ព័ត៌មានបន្ថែម (ជម្រើស)</label>
+                <textarea id="description" placeholder="ការទិញទំនិញ #001" rows="3">ការទិញទំនិញ #001</textarea>
+            </div>
+            
+            <button onclick="generateKHQR()">🎯 បង្កើត KHQR Code</button>
+        </div>
+        
+        <div class="qr-section" id="qrSection" style="display: none;">
+            <h3>📱 KHQR Code របស់អ្នក</h3>
+            
+            <div id="khqrCode">
+                <!-- QR Code នឹងបង្ហាញនៅទីនេះ -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="downloadQRCode()">💾 ទាញយក QR Code</button>
+                <button onclick="printQRCode()" style="background: #2d3748; margin-top: 10px;">🖨️ បោះពុម្ព</button>
+                <button onclick="shareQRCode()" style="background: #38a169; margin-top: 10px;">📤 ចែករំលែក</button>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #e6fffa; border-radius: 8px;">
+                <h4>📋 ព័ត៌មានទូទាត់:</h4>
+                <p><strong>ឈ្មោះអ្នកទទួល:</strong> <span id="displayName">-</span></p>
+                <p><strong>ធនាគារ:</strong> <span id="displayBank">-</span></p>
+                <p><strong>ចំនួនទឹកប្រាក់:</strong> <span id="displayAmount">-</span> ៛</p>
+                <p><strong>ព័ត៌មាន:</strong> <span id="displayDesc">-</span></p>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h4>📖 របៀបប្រើ KHQR:</h4>
+            <ol>
+                <li><strong>សម្រាប់អ្នកលក់:</strong> បង្ហាញ QR Code នេះដល់អតិថិជន</li>
+                <li><strong>សម្រាប់អតិថិជន:</strong>
+                    <ul>
+                        <li>បើកកម្មវិធីធនាគារ (ABA, ACLEDA, ជាដើម)</li>
+                        <li>ចុច "ទូទាត់ QR" ឬ "ស្កេន QR"</li>
+                        <li>ស្កេន QR Code នេះ</li>
+                        <li>ពិនិត្យព័ត៌មាន និងបញ្ជាក់ការទូទាត់</li>
+                    </ul>
+                </li>
+                <li><strong>បន្ទាប់ពីទូទាត់:</strong> អ្នកទាំងពីរនឹងទទួលបានការបញ្ជាក់</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // អនុគមន៍បង្កើត KHQR
+        function generateKHQR() {
+            const merchantName = document.getElementById('merchantName').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const bankCode = document.getElementById('bankCode').value;
+            const amount = document.getElementById('amount').value;
+            const description = document.getElementById('description').value;
+            
+            // ផ្ទៀងផ្ទាត់
+            if (!merchantName || !accountNumber) {
+                alert('សូមបំពេញឈ្មោះអ្នកទទួល និងលេខគណនី!');
+                return;
+            }
+            
+            // បង្កើតទិន្នន័យ KHQR
+            const khqrData = {
+                version: "01",
+                type: "11",
+                merchantAccount: {
+                    bankCode: bankCode,
+                    accountNumber: accountNumber
+                },
+                merchantName: merchantName,
+                currency: "KHR",
+                amount: amount || "",
+                description: description || ""
+            };
+            
+            // បំលែងទៅជាទ្រង់ទ្រាយ KHQR string
+            const khqrString = formatKHQRString(khqrData);
+            
+            // បង្ហាញព័ត៌មាន
+            document.getElementById('displayName').textContent = merchantName;
+            document.getElementById('displayBank').textContent = document.getElementById('bankCode').options[document.getElementById('bankCode').selectedIndex].text;
+            document.getElementById('displayAmount').textContent = amount ? amount + ' ៛' : 'អតិថិជននឹងបញ្ចូល';
+            document.getElementById('displayDesc').textContent = description || 'មិនមាន';
+            
+            // បង្កើត QR Code
+            generateQRCode(khqrString);
+            
+            // បង្ហាញផ្នែក QR
+            document.getElementById('qrSection').style.display = 'block';
+            
+            // រំកិលទៅ QR Code
+            document.getElementById('qrSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // ទ្រង់ទ្រាយទិន្នន័យ KHQR
+        function formatKHQRString(data) {
+            // ទ្រង់ទ្រាយស្តង់ដាររបស់ KHQR
+            let khqrString = "000201";
+            
+            // ទិន្នន័យអ្នកទទួល
+            khqrString += "010212"; // Merchant Account Information
+            khqrString += formatField("00", "KHQR");
+            khqrString += formatField("01", data.merchantAccount.bankCode);
+            khqrString += formatField("02", data.merchantAccount.accountNumber);
+            
+            // ឈ្មោះអ្នកទទួល
+            khqrString += formatField("59", data.merchantName);
+            
+            // រូបិយប័ណ្ណ
+            khqrString += formatField("53", data.currency);
+            
+            // ចំនួនទឹកប្រាក់ (បើមាន)
+            if (data.amount) {
+                khqrString += formatField("54", data.amount);
+            }
+            
+            // ប្រទេស
+            khqrString += formatField("58", "KH");
+            
+            // ព័ត៌មានបន្ថែម (បើមាន)
+            if (data.description) {
+                khqrString += formatField("80", data.description);
+            }
+            
+            khqrString += "6304"; // CRC
+            // ក្នុងការពិត ត្រូវគណនា CRC តែសម្រាប់ឧទាហរណ៍នេះយើងប្រើសាមញ្ញ
+            khqrString += "ABCD";
+            
+            return khqrString;
+        }
+        
+        function formatField(id, value) {
+            const length = value.toString().length.toString().padStart(2, '0');
+            return id + length + value;
+        }
+        
+        // បង្កើត QR Code
+        function generateQRCode(data) {
+            const qrContainer = document.getElementById('khqrCode');
+            qrContainer.innerHTML = '';
+            
+            QRCode.toCanvas(data, { 
+                width: 300,
+                height: 300,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            }, function (error, canvas) {
+                if (error) {
+                    console.error(error);
+                    qrContainer.innerHTML = '<p style="color: red;">មិនអាចបង្កើត QR Code បាន!</p>';
+                    return;
+                }
+                
+                canvas.id = 'qrImage';
+                qrContainer.appendChild(canvas);
+                
+                // បន្ថែមព័ត៌មាន
+                const info = document.createElement('div');
+                info.innerHTML = `
+                    <p style="margin-top: 10px; font-size: 14px; color: #4a5568;">
+                        ស្កេន QR Code នេះដោយប្រើកម្មវិធីធនាគាររបស់អ្នក
+                    </p>
+                    <p style="font-size: 12px; color: #718096;">
+                        KHQR - ប្រព័ន្ធទូទាត់ឆ្លងធនាគាររបស់កម្ពុជា
+                    </p>
+                `;
+                qrContainer.appendChild(info);
+            });
+        }
+        
+        // ទាញយក QR Code
+        function downloadQRCode() {
+            const canvas = document.querySelector('#khqrCode canvas');
+            if (!canvas) {
+                alert('សូមបង្កើត KHQR Code ជាមុនសិន!');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.download = 'khqr-payment.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        // បោះពុម្ព QR Code
+        function printQRCode() {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>បោះពុម្ព KHQR</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; }
+                            h1 { color: #1a365d; }
+                            .qr-container { text-align: center; margin: 30px 0; }
+                            .info { margin-top: 20px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>KHQR សម្រាប់ទូទាត់</h1>
+                        <div class="qr-container">
+                            <img src="${document.querySelector('#khqrCode canvas').toDataURL('image/png')}" width="300">
+                        </div>
+                        <div class="info">
+                            <p><strong>ឈ្មោះអ្នកទទួល:</strong> ${document.getElementById('merchantName').value}</p>
+                            <p><strong>ធនាគារ:</strong> ${document.getElementById('bankCode').options[document.getElementById('bankCode').selectedIndex].text}</p>
+                            <p><strong>ចំនួន:</strong> ${document.getElementById('amount').value || 'អតិថិជននឹងបញ្ចូល'} ៛</p>
+                            <p><strong>កាលបរិច្ឆេទ:</strong> ${new Date().toLocaleDateString('km-KH')}</p>
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                setTimeout(function() {
+                                    window.close();
+                                }, 1000);
+                            }
+                        <\/script>
+                    </body>
+                </html>
+            `);
+        }
+        
+        // ចែករំលែក QR Code
+        function shareQRCode() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'KHQR ទូទាត់',
+                    text: 'ស្កេន KHQR Code នេះដើម្បីទូទាត់',
+                    url: window.location.href
+                });
+            } else {
+                // ប្រើវិធីបុរាណ
+                const canvas = document.querySelector('#khqrCode canvas');
+                if (canvas) {
+                    canvas.toBlob(function(blob) {
+                        const item = new ClipboardItem({ "image/png": blob });
+                        navigator.clipboard.write([item])
+                            .then(() => alert('QR Code ត្រូវបានចម្លងទៅក្តារតម្បៀតខ្ទាស់!'))
+                            .catch(err => console.error(err));
+                    });
+                }
+            }
+        }
+        
+        // ដំណើរការពេលទំព័រផ្ទុក
+        window.addEventListener('load', function() {
+            // បំពេញទិន្នន័យគំរូ
+            document.getElementById('merchantName').value = localStorage.getItem('khqrMerchantName') || 'ហាងអេប៊ីស៊ី';
+            document.getElementById('accountNumber').value = localStorage.getItem('khqrAccount') || '123456789';
+            
+            // រក្សាទុកការផ្លាស់ប្តូរ
+            document.getElementById('merchantName').addEventListener('input', function() {
+                localStorage.setItem('khqrMerchantName', this.value);
+            });
+            
+            document.getElementById('accountNumber').addEventListener('input', function() {
+                localStorage.setItem('khqrAccount', this.value);
+            });
+        });
+    </script>
+</body>
+</html>
